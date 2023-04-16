@@ -1,0 +1,115 @@
+# REQUIREMENTS:
+#   1.19.4 Server
+#   Skript
+#   SkBee (Version 2.8.3)
+#   skript-reflect
+
+# To see exactly where a hologram is, enable show hitboxes via F3+B
+# To kill a hologram, stand near it and do /kill @e[type=text_display,distance=..2]
+
+# Made by Nia#9999
+
+
+import:
+	javax.imageio.ImageIO
+	java.awt.image.BufferedImage
+	java.net.URL
+	java.awt.Color
+	java.lang.Integer
+
+function hologram(link: string, loc: location):
+	set {_url} to new URL({_link})
+	set {_image} to ImageIO.read({_url})
+	set {_height} to {_image}.getHeight()
+	set {_width} to {_image}.getWidth()
+	# NOTE: YOU CAN INCREASE THE MAX SIZE BY A BIT, BUT AT SOME POINT THE TEXT DISPLAYS' NBT WILL BE TOO LONG AND IT MIGHT CRASH YOUR SERVER UPON SPAWNING A HOLOGRAM, OR ATLEAST KICK EVERYONE AND SEND AN ERROR TO CONSOLE.
+	if {_height} > 50:
+		send "image too tall" to console
+		stop
+	if {_width} > 50:
+		send "image too wide" to console
+		stop
+	set {_x} to 0
+	set {_y} to 0
+	set {_thing1} to ""
+	set {_thing2} to ""
+	set {_thing3} to ""
+	set {_thing4} to ""
+	loop {_height} times:
+		loop {_width} times:
+			set {_color} to new Color({_image}.getRGB({_x}, {_y}), true)
+			set {_red} to Integer.toHexString({_color}.getRed())
+			set {_green} to Integer.toHexString({_color}.getGreen())
+			set {_blue} to Integer.toHexString({_color}.getBlue())
+			if length of {_red} is 1:
+				set {_red} to "0%{_red}%"
+			if length of {_green} is 1:
+				set {_green} to "0%{_green}%"
+			if length of {_blue} is 1:
+				set {_blue} to "0%{_blue}%"
+			if mod({_y},2) is 0:
+				if mod({_x},2) is 0:
+					if {_color}.getAlpha() = 255:
+						set {_thing1} to "%{_thing1}%<##%{_red}%%{_green}%%{_blue}%>■"
+					else:
+						set {_thing1} to "%{_thing1}%&l‌‌‌‌‌‌&r"
+					set {_thing2} to "%{_thing2}% "
+				else:
+					set {_thing1} to "%{_thing1}% "
+					if {_color}.getAlpha() = 255:
+						set {_thing2} to "%{_thing2}%<##%{_red}%%{_green}%%{_blue}%>■"
+					else:
+						set {_thing2} to "%{_thing2}%&l‌‌‌‌‌‌&r"
+			else:
+				if mod({_x},2) is 0:
+					if {_color}.getAlpha() = 255:
+						set {_thing3} to "%{_thing3}%<##%{_red}%%{_green}%%{_blue}%>■"
+					else:
+						set {_thing3} to "%{_thing3}%&l‌‌‌‌‌‌&r"
+					set {_thing4} to "%{_thing4}% "
+				else:
+					if loop-value-2 is not {_width}:
+						set {_thing3} to "%{_thing3}% "
+					if {_color}.getAlpha() = 255:
+						set {_thing4} to "%{_thing4}%<##%{_red}%%{_green}%%{_blue}%>■"
+					else:
+						set {_thing4} to "%{_thing4}%&l‌‌‌‌‌‌&r"
+			add 1 to {_x}
+		remove {_width} from {_x}
+		add 1 to {_y}
+		if mod({_y},2) is 0:
+			if loop-number is not {_height}:
+				set {_thing1} to "%{_thing1}%%nl%"
+				set {_thing2} to "%{_thing2}%%nl%"
+				set {_thing3} to "%{_thing3}%%nl%"
+				set {_thing4} to "%{_thing4}%%nl%"
+	loop 4 times:
+		skbee spawn text display at {_loc}
+		set {_td%loop-number%} to last spawned entity
+		set display text of {_td%loop-number%} to formatted {_thing%loop-number%}
+		if loop-value is 1:
+			if mod({_width},2) is 0:
+				set {_seperate} to 0
+			else:
+				set {_seperate} to 0
+			set display translation of {_td%loop-number%} to vector({_seperate},-0.25,0)
+		if loop-value is 2:
+			if mod({_width},2) is 0:
+				set {_seperate} to 0.025
+			else:
+				set {_seperate} to 0
+			set display translation of {_td%loop-number%} to vector({_seperate},-0.25,0)
+		if loop-value is 3:
+			if mod({_width},2) is 0:
+				set {_seperate} to -0.05
+			else:
+				set {_seperate} to 0
+			set display translation of {_td%loop-number%} to vector({_seperate},-0.375,0)
+		if loop-value is 4:
+			if mod({_width},2) is 0:
+				set {_seperate} to 0.025
+			else:
+				set {_seperate} to 0
+			set display translation of {_td%loop-number%} to vector({_seperate},-0.375,0)
+		set display text background color of {_td%loop-number%} to bukkitColor(0,0,0,0)
+		set display line width of {_td%loop-number%} to 1000
